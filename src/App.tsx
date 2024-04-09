@@ -1,5 +1,6 @@
-import React from "react";
-import { Button, MantineProvider, createTheme } from "@mantine/core";
+import { MantineProvider, createTheme } from "@mantine/core";
+import { RouterProvider } from "react-router-dom";
+import { router } from "router";
 
 const theme = createTheme({
 	white: "#F7F8FF",
@@ -7,13 +8,9 @@ const theme = createTheme({
 });
 
 const App = () => {
-	console.log(process.env.TOKEN);
-
 	return (
 		<MantineProvider theme={theme} defaultColorScheme='dark'>
-			<div className="App">
-				<Button variant="outline" radius="xs">Button</Button>
-			</div>
+			<RouterProvider router={router}/>
 		</MantineProvider>
 	);
 };
