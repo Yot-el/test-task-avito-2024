@@ -1,11 +1,6 @@
 import { NoParamsError } from "models/classes";
 import { IFilters } from "models/models";
-
-const fixedEncodeURIComponent = (str: string): string => {
-	return encodeURIComponent(str).replace(/[!'()*]/g, (c) => {
-		return "%" + c.charCodeAt(0).toString(16);
-	});
-};
+import { fixedEncodeURIComponent } from "./utils";
 
 const yearsToString = (startYear: number | null, endYear: number | null): string => {
 	if (startYear && endYear) {
