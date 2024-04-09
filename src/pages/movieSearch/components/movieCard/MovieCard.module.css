@@ -1,0 +1,12 @@
+.card {
+  flex-grow: 1;
+}
+
+.description {
+  flex-grow: 1;
+}
+
+.button {
+  margin-top: auto;
+  align-self: flex-start;
+}
