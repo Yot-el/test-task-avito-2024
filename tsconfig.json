@@ -1,10 +1,12 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
+        "target": "es2021",
+        "jsx": "react-jsx",
+        "strict": true,
+        "baseUrl": "./src",
         "allowJs": true,
         "alwaysStrict": true,
         "esModuleInterop": true,
-        "jsx": "react",
         "allowUnreachableCode": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
@@ -12,8 +14,9 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "isolatedModules": true,
-        "resolveJsonModule": true
+        "moduleResolution": "node",
+        "types": [ "node" ],
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "declaration.d.ts"],
     "exclude": ["node_modules"]
 }
