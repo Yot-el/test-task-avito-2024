@@ -16,12 +16,12 @@ const options: RequestInit = {
 export const fetchData = async <T>(url: string, signal?: AbortSignal): Promise<T> => {
 	try {
 		const response = await fetch(`${BASE_URL}${url}`, { ...options, signal });
+		const data = await response?.json();
 
 		if (!response.ok) {
-			throw new ServerResponseError(response.status);
+			throw new ServerResponseError(response.status, data.message);
 		}
 
-		const data = await response?.json();
 		return data;
 	} catch (e: unknown) {
 		if (e instanceof Error) {
