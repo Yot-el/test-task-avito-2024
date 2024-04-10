@@ -5,9 +5,10 @@ import ErrorModal from "components/ErrorModal";
 import YearsSelect from "components/filters/YearsSelect/YearsSelect";
 import AgeRatingSelect from "components/filters/ageRatingSelect/AgeRatingSelect";
 import CountriesSelect from "components/filters/countrySelect/CountriesSelect";
+import { MoviesContext } from "context/movieSearch.context";
 import { AbortError } from "models/classes";
 import { ICountries, IFilters } from "models/models";
-import { useLayoutEffect, useState } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 
 const onAgeRatingChange = (value: string | null, filters: UseFormReturnType<IFilters>): void => {
 	filters.setFieldValue("ageRating", value ? parseInt(value) : null );
@@ -30,6 +31,7 @@ interface IFiltersProps {
 const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
 	const [countries, setCountries] = useState<ICountries[]>([]);
 	const [error, setError] = useState<Error>();
+	const { pageData, setPageData } = useContext(MoviesContext);
 
 	const onFromSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -84,8 +86,10 @@ const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
 					label="Количество фильмов на странице"
 					placeholder="выберите количество фильмов"
 					data={["10", "20", "50", "100"]}
-					value={`${filters.values.pageLimit}`}
-					onChange={(value) => { filters.setFieldValue("pageLimit", value ? parseInt(value) : 10); }}
+					value={`${pageData.limit}`}
+					onChange={(value) => {
+						setPageData({ ...pageData, limit: value ? parseInt(value) : 10 });
+					}}
 				/>
 				<AgeRatingSelect value={filters.values.ageRating} onChange={(value) => onAgeRatingChange(value, filters)} />
 				<Fieldset legend="Страны производства">

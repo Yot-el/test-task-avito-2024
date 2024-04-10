@@ -2,7 +2,7 @@ import { Stack, Pagination, Flex, Divider, Text, Loader } from "@mantine/core";
 import MovieCard from "./components/movieCard/MovieCard";
 import Filters from "./components/filters/Filters";
 import { IFilters, IPageData } from "models/models";
-import { useLayoutEffect, useState } from "react";
+import { useContext, useEffect, useLayoutEffect } from "react";
 import { AbortError, NoParamsError } from "models/classes";
 import * as classes from "./MovieSearch.module.css";
 import ErrorModal from "components/ErrorModal";
@@ -10,15 +10,10 @@ import { fetchData } from "api/api";
 import { useForm } from "@mantine/form";
 import { URLParamsToFilters, filtersToURLParams } from "api/filters";
 import { useSearchParams } from "react-router-dom";
+import { MoviesContext } from "context/movieSearch.context";
 
 const MovieSearch = () => {
-	const [pageData, setPageData] = useState<IPageData>({
-		docs: [],
-		total: 0,
-		limit: 10,
-		page: 1,
-		pages: 11,
-	});
+	const { pageData, setPageData, isLoading, setIsLoading, error, setError } = useContext(MoviesContext);
 
 	const filters = useForm<IFilters>({
 		initialValues: {
@@ -27,7 +22,6 @@ const MovieSearch = () => {
 			includedCountries: [],
 			excludedCountries: [],
 			ageRating: null,
-			pageLimit: 10,
 		},
 		validate: {
 			startYear: (value) => {
@@ -48,8 +42,6 @@ const MovieSearch = () => {
 	});
 
 	const paginationPageLimit = pageData.page + 10;
-	const [isLoading, setIsLoading] = useState<boolean>(true);
-	const [error, setError] = useState<Error>();
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const changePage = (page: number): void => {
@@ -62,10 +54,16 @@ const MovieSearch = () => {
 		const selectedFields = "selectFields=id&selectFields=name&selectFields=description&selectFields=year&selectFields=ageRating&selectFields=genres&selectFields=countries&selectFields=poster";
 
 		const filterParams = filtersToURLParams(filters.values);
-		setSearchParams(filterParams);
+		setSearchParams(new URLSearchParams({ ...searchParams, ...filterParams }));
 
 		try {
-			const data = await fetchData<IPageData>(`/v1.4/movie?page=${page}&${filterParams.toString()}&${selectedFields}`, signal);
+			let url = `/v1.4/movie?page=${page}&limit=${pageData.limit}&${selectedFields}`;
+
+			if (filterParams.toString()) {
+				url += `&${filterParams.toString()}`;
+			}
+
+			const data = await fetchData<IPageData>(url, signal);
 			localStorage.setItem("pageData", JSON.stringify(data));
 			setPageData(data);
 			setIsLoading(false);
@@ -80,11 +78,26 @@ const MovieSearch = () => {
 		}
 	};
 
+	useEffect(() => {
+		setSearchParams(new URLSearchParams({ ...searchParams, limit: `${pageData.limit}`, page: `${pageData.page}` }));
+	}, [pageData]);
+
 	useLayoutEffect(() => {
 		setIsLoading(true);
 		const abortController = new AbortController();
 
-		// Попытка забрать параметры фильтрации из URL
+		const limitFromParams = searchParams.get("limit");
+		const pageFromParams = searchParams.get("page");
+
+		if (limitFromParams || pageFromParams) {
+			setPageData({
+				...pageData,
+				limit: limitFromParams ? parseInt(limitFromParams) : 10,
+				page: pageFromParams ? parseInt(pageFromParams) : 1
+			});
+		}
+
+		//Попытка забрать параметры фильтрации из URL
 		try {
 			const filtersFromParams = URLParamsToFilters(searchParams);
 			filters.setValues(filtersFromParams);
@@ -110,6 +123,7 @@ const MovieSearch = () => {
 
 			throw e;
 		}
+
 		return () => {
 			abortController.abort();
 		};
