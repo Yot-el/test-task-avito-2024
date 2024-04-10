@@ -37,7 +37,6 @@ export interface IFilters {
 	includedCountries: string[];
 	excludedCountries: string[];
 	ageRating: number | null;
-	pageLimit: number;
 }
 
 export interface IMantineInputProps<T> {

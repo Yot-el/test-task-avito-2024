@@ -23,9 +23,6 @@ const countryToString = (country: string, isExcluded = false): string => fixedEn
 export const filtersToURLParams = (filters: IFilters): URLSearchParams => {
 	const params = new URLSearchParams();
 
-	const limit = `${filters.pageLimit ?? 10}`;
-	params.append("limit", limit);
-
 	const year = filters.startYear || filters.endYear ? `${yearsToString(filters.startYear, filters.endYear)}` : "";
 	if (year) params.append("year", year);
 
@@ -50,7 +47,6 @@ export const URLParamsToFilters = (params: URLSearchParams): IFilters => {
 		includedCountries: [],
 		excludedCountries: [],
 		ageRating: null,
-		pageLimit: 10,
 	};
 
 	for (const [key, value] of params.entries()) {
@@ -78,10 +74,6 @@ export const URLParamsToFilters = (params: URLSearchParams): IFilters => {
 		if (key === "ageRating") {
 			filters.ageRating = parseInt(decodedValue);
 			continue;
-		}
-
-		if (key === "limit") {
-			filters.pageLimit = parseInt(decodedValue);
 		}
 	}
 
