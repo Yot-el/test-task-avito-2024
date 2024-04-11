@@ -52,3 +52,13 @@ export interface IMantineSelectProps {
 	value?: string[];
 	onChange?(value: string[]): void;
 }
+
+export interface IPerson {
+	id: number;
+	photo?: string;
+	name?: string;
+	enName?: string;
+	description?: string | null;
+	profession?: string;
+	enProfession?: string;
+}
