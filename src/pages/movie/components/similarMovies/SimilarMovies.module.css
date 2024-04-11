@@ -1,0 +1,27 @@
+.carousel {
+  flex-grow: 1;
+  width: 0;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    width: 100%;
+  }
+}
+
+.slide {
+  display: flex;
+  justify-content: center;
+}
+
+.link {
+  text-decoration: none;
+  display: flex;
+  transition: scale 0.3s ease;
+}
+
+.link:hover {
+  scale: 0.95;
+
+  @media (max-width: em(745)) {
+    scale: none;
+  }
+}
