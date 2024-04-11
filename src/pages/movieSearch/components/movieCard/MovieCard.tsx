@@ -20,7 +20,11 @@ const MovieCard = ({ movie }: MovieCardProps) => {
 							<Title order={2} c="yellow.6">
 								{ name }
 							</Title>
-							<AgeRating value={ageRating}/>
+							{
+								ageRating ?
+									<AgeRating value={ageRating}/> :
+									null
+							}
 							<Text>
 								{ year }
 							</Text>
@@ -34,11 +38,17 @@ const MovieCard = ({ movie }: MovieCardProps) => {
 								))
 							}
 						</Flex>
-						<Text>
-							{
-								countries.map((country) => country.name).sort().join(", ")
-							}
-						</Text>
+						{
+							countries ?
+								<Text>
+									{
+										countries.map((country) => country.name).sort().join(", ")
+									}
+								</Text>
+								:
+								null
+						}
+						
 					</Stack>
 					<Text size="md" lineClamp={3}>
 						{ description }

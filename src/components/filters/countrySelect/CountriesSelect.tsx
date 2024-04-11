@@ -1,7 +1,7 @@
 import { MultiSelect } from "@mantine/core";
-import { ICountries, IMantineSelectProps } from "models/models";
+import { ICountry, IMantineSelectProps } from "models/models";
 
-interface ICountriesSelect extends ICountries {
+interface ICountriesSelect extends ICountry {
 	disabled?: boolean,
 }
 

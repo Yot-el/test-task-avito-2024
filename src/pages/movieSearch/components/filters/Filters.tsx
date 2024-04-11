@@ -7,7 +7,7 @@ import AgeRatingSelect from "components/filters/ageRatingSelect/AgeRatingSelect"
 import CountriesSelect from "components/filters/countrySelect/CountriesSelect";
 import { MoviesContext } from "context/movieSearch.context";
 import { AbortError } from "models/classes";
-import { ICountries, IFilters } from "models/models";
+import { ICountry, IFilters } from "models/models";
 import { useContext, useLayoutEffect, useState } from "react";
 
 const onAgeRatingChange = (value: string | null, filters: UseFormReturnType<IFilters>): void => {
@@ -29,7 +29,7 @@ interface IFiltersProps {
 }
 
 const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
-	const [countries, setCountries] = useState<ICountries[]>([]);
+	const [countries, setCountries] = useState<ICountry[]>([]);
 	const [error, setError] = useState<Error>();
 	const { pageData, setPageData } = useContext(MoviesContext);
 
@@ -48,7 +48,7 @@ const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
 
 	const fetchCountriesNames = async (signal?: AbortSignal) => {
 		try {
-			const data = await fetchData<ICountries[]>("/v1/movie/possible-values-by-field?field=countries.name", signal);
+			const data = await fetchData<ICountry[]>("/v1/movie/possible-values-by-field?field=countries.name", signal);
 			localStorage.setItem("countries", JSON.stringify(data));
 			setCountries(data);
 		} catch (e: unknown) {
