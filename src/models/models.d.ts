@@ -1,26 +1,67 @@
-export interface IGenres {
+export interface IGenre {
 	name: string
 }
 
-export interface ICountries {
+export interface ICountry {
 	name: string;
 	slug?: string;
 }
 
-interface IPoster {
+interface IImage {
 	url: string;
 	previewUrl: string;
+}
+
+type MovieType = "movie" | "tv-series" | "cartoon" | "anime" | "animated-series" | "tv-show"
+
+interface IRating {
+	kp?: number | null;
+	imdb?: number | null;
+	tmdb?: number | null;
+	filmCritics?: number | null;
+	russianFilmCritics?: number | null;
+	await?: number | null;
+}
+
+interface IReviewInfo {
+	count?: number | null;
+	positiveCount?: number | null;
+	percentage?: number | null;
 }
 
 export interface IMovie {
 	id: number;
 	name: string;
-	ageRating: number;
-	year: number;
-	countries: ICountries[];
-	description: string;
-	poster: IPoster;
-	genres: IGenres[];
+	alternativeName?: string | null;
+	enName?: string | null;
+	type?: MovieType | null;
+	year?: number | null;
+	description?: string | null;
+	shortDescription?: string | null;
+	rating?: IRating | null;
+	countries: ICountry[] | null;
+	ageRating?: number | null;
+	poster: IImage;
+	backdrop: IImage;
+	genres: IGenre[];
+	persons?: IPerson[] | null;
+	reviewInfo?: IReviewInfo | null;
+	seasonsInfo?: {
+		number?: number | null;
+		episodesCount?: number | null;
+	} | null;
+	similarMovies?: ILinkedMovie[] | null;
+	sequelsAndPreques?: ILinkedMovie[] | null;
+	isSeries?: boolean | null;
+}
+
+export interface ILinkedMovie {
+	id: number;
+	name: string | null;
+	enName: string | null;
+	alternativeName: string;
+	type: MovieType;
+	poster: IImage;
 }
 
 export interface IPageData {
