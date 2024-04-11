@@ -5,6 +5,7 @@ const { webpack, DefinePlugin } = require("webpack");
 module.exports = {
 	entry: path.resolve(__dirname, "src/index.tsx"),
 	output: {
+		publicPath: '/',
 		path: path.resolve(__dirname, "build"),
 		filename: "bundle.js",
 		clean: true,
@@ -13,6 +14,7 @@ module.exports = {
 		port: 7070,
 		open: true,
 		hot: true,
+		historyApiFallback: true,
 		static: {
 			directory: path.resolve(__dirname, "dist"),
 		}
