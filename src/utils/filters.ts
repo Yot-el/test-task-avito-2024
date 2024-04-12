@@ -1,6 +1,5 @@
 import { NoParamsError } from "models/classes";
 import { IFilters } from "models/models";
-import { fixedEncodeURIComponent } from "./utils";
 
 const yearsToString = (startYear: number | null, endYear: number | null): string => {
 	if (startYear && endYear) {
@@ -18,7 +17,7 @@ const stringToYears = (value: string) => {
 	return years.length === 2 ? years : [years[0], null];
 };
 
-const countryToString = (country: string, isExcluded = false): string => fixedEncodeURIComponent(`${isExcluded ? "!" : "+"}${country}`);
+const countryToString = (country: string, isExcluded = false): string => `${isExcluded ? "!" : "+"}${country}`;
 
 export const filtersToURLParams = (filters: IFilters): URLSearchParams => {
 	const params = new URLSearchParams();
@@ -32,6 +31,9 @@ export const filtersToURLParams = (filters: IFilters): URLSearchParams => {
 	const countries = [...filters.includedCountries.map((country) => countryToString(country)),
 		...filters.excludedCountries.map((country) => countryToString(country, true))];
 	countries.forEach((country) => params.append("countries.name", country));
+
+	params.append("limit", `${filters.limit}`);
+	params.append("page", `${filters.page}`);
 
 	return params;
 };
@@ -47,6 +49,8 @@ export const URLParamsToFilters = (params: URLSearchParams): IFilters => {
 		includedCountries: [],
 		excludedCountries: [],
 		ageRating: null,
+		limit: 10,
+		page: 1,
 	};
 
 	for (const [key, value] of params.entries()) {
@@ -74,6 +78,15 @@ export const URLParamsToFilters = (params: URLSearchParams): IFilters => {
 		if (key === "ageRating") {
 			filters.ageRating = parseInt(decodedValue);
 			continue;
+		}
+
+		if (key === "limit") {
+			filters.limit = parseInt(decodedValue);
+			continue;
+		}
+
+		if (key === "page") {
+			filters.page = parseInt(decodedValue);
 		}
 	}
 
