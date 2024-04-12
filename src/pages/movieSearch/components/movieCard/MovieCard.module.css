@@ -2,11 +2,23 @@
   flex-grow: 1;
 }
 
-.description {
-  flex-grow: 1;
-}
-
 .button {
   margin-top: auto;
   align-self: flex-start;
+}
+
+.image {
+  color: var(--text-color);
+  text-decoration: none;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    align-self: start;
+  }
+}
+
+.image-layout {
+  width: em(150);
+  height: em(220);
+  background-color: var(--mantine-color-dark-8);
+  align-items: center;
 }

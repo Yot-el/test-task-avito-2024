@@ -1,8 +1,9 @@
 import { Carousel } from "@mantine/carousel";
 import * as classes from "./SimilarMovies.module.css";
 import { Link } from "react-router-dom";
-import { Stack, Image, Title } from "@mantine/core";
+import { Stack, Image, Title, AspectRatio } from "@mantine/core";
 import { ILinkedMovie } from "models/models";
+import InfoLayout from "components/infoLayout/InfoLayout";
 
 interface ISimilarMoviesProps {
   movies: ILinkedMovie[];
@@ -25,7 +26,11 @@ const SimilarMovies = ({ movies, isMobile }: ISimilarMoviesProps) => {
 					<Carousel.Slide className={classes["slide"]} key={movie.id}>
 						<Link className={classes["link"]} to={`/movie/${movie.id}`}>
 							<Stack gap="xs" align="center" justify="start">
-								<Image h={200} w={150} radius="sm" src={movie.poster.previewUrl} />
+								<InfoLayout className={!movie.poster.previewUrl ? classes["image-layout"] : ""} isEmpty={!movie.poster.previewUrl} message="Нет превью :(">
+									<AspectRatio ratio={668/1000} h={200} w={150}>
+										<Image radius="sm" src={movie.poster.previewUrl}/>
+									</AspectRatio>
+								</InfoLayout>
 								<Title order={3} size="h5" c="yellow.6">
 									{ movie.name }
 								</Title>

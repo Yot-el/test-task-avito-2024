@@ -6,7 +6,7 @@ import { Outlet } from "react-router";
 const Layout = () => {
 	return (
 		<MoviesContextProvider>
-			<AppShell header={{ height: { base: 48, sm: 60, lg: 76 } }} padding="md">
+			<AppShell header={{ height: { base: 80, sm: 60 } }} padding="md">
 				<Header />
 				<AppShell.Main display="flex">
 					<Outlet />
