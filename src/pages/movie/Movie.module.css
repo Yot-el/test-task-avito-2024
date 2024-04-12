@@ -1,0 +1,54 @@
+.main-section {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  gap: 20px;
+}
+
+.movie-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: rem(15px);
+}
+
+.movie-info {
+
+}
+
+.title {
+  text-wrap: balance;
+}
+
+.movie-description {
+  @media (max-width: $mantine-breakpoint-md) {
+    grid-column: span 2;
+  }
+}
+
+.similar-movies-container {
+  @media (max-width: $mantine-breakpoint-md) {
+    grid-column: span 2;
+  }
+}
+
+.posters-slide {
+  grid-row: span 3;
+  display: flex;
+  margin-top: 1.5rem;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    margin-top: 0;
+    grid-row: span 1;
+  }
+}
+
+.similar-movies-divider {
+  @media (max-width: em(745)) {
+    width: 100%;
+  }
+}
+
+.similar-movies-info-layout {
+  @media (max-width: em(745)) {
+    width: 100%;
+  }
+}
