@@ -1,0 +1,62 @@
+.pagination-inner {
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    flex-direction: row;
+  }
+}
+
+.pagination-button {
+  display: flex;
+  align-items: center;
+  text-wrap: nowrap;
+  cursor: pointer;
+  padding: rem(5);
+}
+
+.pagination-button:hover {
+  background-color: var(--mantine-color-dark-6);
+}
+
+.pagination-button-active,
+.pagination-button-active:hover {
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-color-yellow-7);
+}
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  gap: 15px;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.episodes-layout {
+  justify-content: flex-start;
+}
+
+.seasons-list-scroll {
+  height: em(300);
+  width: auto;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    width: auto;
+    height: em(200);
+  }
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    width: em(400);
+    height: auto;
+  };
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    width: em(300);
+    height: auto;
+  };
+}

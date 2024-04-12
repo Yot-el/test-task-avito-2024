@@ -1,0 +1,31 @@
+.image-container {
+  min-width: rem(500);
+  height: rem(300);
+  display: flex;
+
+  @media (max-width: $mantine-breakpoint-md) {
+    height: rem(200);
+    min-width: rem(400);
+  }
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    height: auto;
+    min-width: rem(200);
+  }
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    min-width: 0;
+    height: rem(200);
+    width: 100%;
+  }
+}
+
+.image-layout {
+  background-color: var(--mantine-color-dark-8);
+  align-items: center;
+}
+
+.text {
+  grid-column: 2;
+  grid-row: 2;
+}
