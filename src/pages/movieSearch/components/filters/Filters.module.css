@@ -1,0 +1,29 @@
+.form {
+  display: flex;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    translate: 0 -100%;
+    justify-content: center;
+    background-color: var(--mantine-color-dark-7);
+    border-bottom: 1px solid var(--mantine-color-dark-4);
+    padding: 0 20px 20px 0;
+  }
+}
+
+.form--open {
+  @media (max-width: $mantine-breakpoint-sm) {
+    translate: 0 0;
+  }
+}
+
+.close-button {
+  @media (max-width: $mantine-breakpoint-sm) {
+    top: 0;
+    right: -10px;
+  }
+}

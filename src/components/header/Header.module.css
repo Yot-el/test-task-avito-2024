@@ -1,3 +1,17 @@
 .search {
   width: 50%;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    width: 100%;
+  }
+}
+
+.container {
+  height: 100%;
+  display: flex;
+}
+
+.flex-inner {
+  padding: 5px;
+  flex-grow: 1;
 }
