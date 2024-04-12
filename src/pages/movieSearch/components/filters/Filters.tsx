@@ -1,6 +1,6 @@
-import { Button, Fieldset, Select, Stack } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
-import { fetchData } from "api/api";
+import { Button, CloseButton, Fieldset, Flex, Select, VisuallyHidden } from "@mantine/core";
+import { UseFormReturnType, useForm } from "@mantine/form";
+import { fetchData } from "utils/api";
 import ErrorModal from "components/ErrorModal";
 import YearsSelect from "components/filters/YearsSelect/YearsSelect";
 import AgeRatingSelect from "components/filters/ageRatingSelect/AgeRatingSelect";
@@ -8,10 +8,15 @@ import CountriesSelect from "components/filters/countrySelect/CountriesSelect";
 import { MoviesContext } from "context/movieSearch.context";
 import { AbortError } from "models/classes";
 import { ICountry, IFilters } from "models/models";
-import { useContext, useLayoutEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useLayoutEffect, useState } from "react";
+import * as classes from "./Filters.module.css";
 
 const onAgeRatingChange = (value: string | null, filters: UseFormReturnType<IFilters>): void => {
 	filters.setFieldValue("ageRating", value ? parseInt(value) : null );
+};
+
+const onLimitChange = (value: string | null, filters: UseFormReturnType<IFilters>): void => {
+	filters.setFieldValue("limit", value ? parseInt(value) : 10 );
 };
 
 const onYearsSelectChange = (type: string, value: number | string, filters: UseFormReturnType<IFilters>): void => {
@@ -23,27 +28,49 @@ const onYearsSelectChange = (type: string, value: number | string, filters: UseF
 };
 
 interface IFiltersProps {
-	filters: UseFormReturnType<IFilters>;
-	page: number;
-	onSubmit(page: number, signal?: AbortSignal): Promise<void>;
+	onSubmit(filters: IFilters, signal?: AbortSignal): Promise<void>;
+	onReset: () => void;
+	isOpen: boolean;
+	setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
+const Filters = ({ onSubmit, onReset, isOpen, setIsOpen }: IFiltersProps) => {
+	const { filters } = useContext(MoviesContext);
 	const [countries, setCountries] = useState<ICountry[]>([]);
 	const [error, setError] = useState<Error>();
-	const { pageData, setPageData } = useContext(MoviesContext);
+
+	const formFiltersValues = useForm<IFilters>({
+		initialValues: filters,
+		validate: {
+			startYear: (value) => {
+				if (value && value > (formFiltersValues.values.endYear ?? new Date().getFullYear())) {
+					return "Значение превышает крайнюю границу диапазона лет выпусков";
+				}
+
+				return null;
+			},
+			endYear: (value) => {
+				if (value && value < (formFiltersValues.values.startYear ?? 1890)) {
+					return "Значение меньше левой границы диапазона лет выпусков";
+				}
+
+				return null;
+			}
+		}
+	});
 
 	const onFromSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		const validateResult = filters.validate();
 
-		localStorage.setItem("filters", JSON.stringify(filters.values));
+		const abortController = new AbortController();
+		const validateResult = formFiltersValues.validate();
+		localStorage.setItem("filters", JSON.stringify(formFiltersValues.values));
 
 		if (validateResult.hasErrors) {
 			return;
 		}
 
-		onSubmit(page);
+		onSubmit(formFiltersValues.values, abortController.signal);
 	};
 
 	const fetchCountriesNames = async (signal?: AbortSignal) => {
@@ -63,6 +90,10 @@ const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
 		}
 	};
 
+	useEffect(() => {
+		formFiltersValues.setValues(filters);
+	}, [filters]);
+
 	useLayoutEffect(() => {
 		const abortController = new AbortController();
 
@@ -80,47 +111,76 @@ const Filters = ({ filters, page, onSubmit }: IFiltersProps) => {
 	}, []);
 
 	return (
-		<form onSubmit={onFromSubmit} onReset={filters.onReset}>
-			<Stack w={300}>
+		<form
+			className={[classes["form"], isOpen ? classes["form--open"] : null].join(" ")}
+			onSubmit={onFromSubmit}
+			onReset={onReset}
+		>
+			<CloseButton
+				hiddenFrom="sm"
+				className={classes["close-button"]}
+				pos="absolute"
+				size="lg"
+				onClick={() => { setIsOpen(false); }}
+			>
+				<VisuallyHidden>
+					Закрыть фильтры
+				</VisuallyHidden>
+			</CloseButton>
+			<Flex
+				w={{ base: "auto", md: 300 }}
+				direction={{ base: "column", xs: "row", sm: "column" }}
+				wrap="wrap"
+				gap="sm"
+			>
 				<Select
 					label="Количество фильмов на странице"
 					placeholder="выберите количество фильмов"
 					data={["10", "20", "50", "100"]}
-					value={`${pageData.limit}`}
-					onChange={(value) => {
-						setPageData({ ...pageData, limit: value ? parseInt(value) : 10 });
-					}}
+					value={`${formFiltersValues.values.limit}`}
+					onChange={(value) => onLimitChange(value, formFiltersValues)}
 				/>
-				<AgeRatingSelect value={filters.values.ageRating} onChange={(value) => onAgeRatingChange(value, filters)} />
+				<AgeRatingSelect
+					value={formFiltersValues.values.ageRating}
+					onChange={(value) => onAgeRatingChange(value, formFiltersValues)}
+				/>
 				<Fieldset legend="Страны производства">
 					<CountriesSelect
 						countriesData={countries.map((country) => (
-							{ name: country.name, disabled: filters.values.excludedCountries.includes(country.name) }
+							{ name: country.name, disabled: formFiltersValues.values.excludedCountries.includes(country.name) }
 						))}
-						{...filters.getInputProps("includedCountries")}
 						label="Включающие страны"
-						placeholder="Выберите страны"/>
+						placeholder="Выберите страны"
+						{...formFiltersValues.getInputProps("includedCountries")}
+					/>
 					<CountriesSelect
 						countriesData={countries.map((country) => (
-							{ name: country.name, disabled: filters.values.includedCountries.includes(country.name) }
+							{ name: country.name, disabled: formFiltersValues.values.includedCountries.includes(country.name) }
 						))}
-						{...filters.getInputProps("excludedCountries")}
 						label="Исключающие страны"
-						placeholder="Выберите страны"/>
+						placeholder="Выберите страны"
+						{...formFiltersValues.getInputProps("excludedCountries")}
+					/>
 				</Fieldset>
 				<YearsSelect
-					startYear={filters.values.startYear}
-					endYear={filters.values.endYear}
-					onChange={(type, value) => onYearsSelectChange(type, value, filters)}
-					errors={{ startYear: filters.errors.startYear, endYear: filters.errors.endYear }}
+					startYear={formFiltersValues.values.startYear}
+					endYear={formFiltersValues.values.endYear}
+					onChange={(type, value) => onYearsSelectChange(type, value, formFiltersValues)}
+					errors={{ startYear: formFiltersValues.errors.startYear, endYear: formFiltersValues.errors.endYear }}
 				/>
-				<Button size="md" type="submit">
+				<Flex
+					style={{ flexGrow: 1 }}
+					direction={{ base: "column", xs: "row", sm: "column" }}
+					gap="sm"
+				>
+					<Button size="md" type="submit">
 					Применить фильтры
-				</Button>
-				<Button size="md" type="reset" variant="outline" c="yellow.6">
+					</Button>
+					<Button size="md" type="reset" variant="outline" c="yellow.6">
 					Очистить фильтры
-				</Button>
-			</Stack>
+					</Button>
+				</Flex>
+			</Flex>
 			{
 				error &&
 				<ErrorModal error={error}/>

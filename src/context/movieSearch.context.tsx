@@ -1,16 +1,9 @@
-import { IPageData } from "models/models";
-import { Dispatch, SetStateAction, createContext, useState } from "react";
+import { filtersToURLParams } from "utils/filters";
+import { IFilters, IPageData } from "models/models";
+import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-interface IMoviesContextProviderValue {
-  pageData: IPageData;
-  setPageData: Dispatch<SetStateAction<IPageData>>;
-  isLoading: boolean;
-  setIsLoading: Dispatch<SetStateAction<boolean>>;
-	error: Error | undefined;
-	setError: Dispatch<SetStateAction<Error | undefined>>;
-}
-
-const defaultContextValue: IPageData = {
+const defaultPageDataValue: IPageData = {
 	docs: [],
 	total: 0,
 	limit: 10,
@@ -18,9 +11,34 @@ const defaultContextValue: IPageData = {
 	pages: 11,
 };
 
+const defaultFiltersValue: IFilters = {
+	startYear: null,
+	endYear: null,
+	includedCountries: [],
+	excludedCountries: [],
+	ageRating: null,
+	limit: 10,
+	page: 1,
+};
+
+interface IMoviesContextProviderValue {
+  pageData: IPageData;
+  setPageData: Dispatch<SetStateAction<IPageData>>;
+	filters: IFilters;
+	setFilters: Dispatch<SetStateAction<IFilters>>;
+	resetFilters: () => void;
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+	error: Error | undefined;
+	setError: Dispatch<SetStateAction<Error | undefined>>;
+}
+
 export const MoviesContext = createContext<IMoviesContextProviderValue>({
-	pageData: defaultContextValue,
+	pageData: defaultPageDataValue,
 	setPageData: () => {},
+	filters: defaultFiltersValue,
+	setFilters: () => {},
+	resetFilters: () => {},
 	isLoading: true,
 	setIsLoading: () => {},
 	error: undefined,
@@ -28,12 +46,21 @@ export const MoviesContext = createContext<IMoviesContextProviderValue>({
 });
 
 export const MoviesContextProvider = ({ children }: React.PropsWithChildren) => {
-	const [pageData, setPageData] = useState<IPageData>(defaultContextValue);
+	const [pageData, setPageData] = useState<IPageData>(defaultPageDataValue);
+	const [filters, setFilters] = useState<IFilters>(defaultFiltersValue);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<Error>();
+	const resetFilters = () => { setFilters(defaultFiltersValue); };
+
+	const [, setSearchParams] = useSearchParams();
+
+	useEffect(() => {
+		const filterParams = filtersToURLParams(filters);
+		setSearchParams(filterParams);
+	}, [filters]);
 
 	return (
-		<MoviesContext.Provider value={{ pageData, setPageData, isLoading, setIsLoading, error, setError }}>
+		<MoviesContext.Provider value={{ pageData, setPageData, filters, setFilters, resetFilters, isLoading, setIsLoading, error, setError }}>
 			{ children }
 		</MoviesContext.Provider>
 	);
