@@ -8,8 +8,8 @@ export interface ICountry {
 }
 
 interface IImage {
-	url: string;
-	previewUrl: string;
+	url: string | null;
+	previewUrl: string | null;
 }
 
 type MovieType = "movie" | "tv-series" | "cartoon" | "anime" | "animated-series" | "tv-show"
@@ -42,7 +42,7 @@ export interface IMovie {
 	countries: ICountry[] | null;
 	ageRating?: number | null;
 	poster: IImage;
-	backdrop: IImage;
+	backdrop?: IImage;
 	genres: IGenre[];
 	persons?: IPerson[] | null;
 	reviewInfo?: IReviewInfo | null;
@@ -64,12 +64,56 @@ export interface ILinkedMovie {
 	poster: IImage;
 }
 
-export interface IPageData {
-	docs: IMovie[];
+interface IReview {
+	id: number;
+	title: string;
+	type?: "Нейтральный" | "Позитивный" | "Негативный";
+	review: string;
+	date: string;
+	author: string;
+}
+
+export interface IDocs {
 	total: number;
 	limit: number;
 	page: number;
 	pages: number;
+}
+
+export interface IPageData extends IDocs {
+	docs: IMovie[];
+}
+
+export interface ISeasonsData extends IDocs {
+	docs: ISeason[];
+}
+
+export interface IPostersData extends IDocs {
+	docs: IImage[];
+}
+
+export interface IReviewData extends IDocs {
+	docs: IReview[];
+}
+
+export interface IEpisode {
+	number: number;
+	name: string | null;
+	enName: string | null;
+	still: IImage;
+	duration: number | null;
+	date: Date | string | null;
+	airDate: string | null;
+	description: string | null;
+	enDescription: string | null;
+}
+
+export interface ISeason {
+	id: string;
+	number: number;
+	name: string | null;
+	episodesCount?: number;
+	episodes: IEpisode[];
 }
 
 export interface IFilters {
@@ -78,6 +122,8 @@ export interface IFilters {
 	includedCountries: string[];
 	excludedCountries: string[];
 	ageRating: number | null;
+	limit: number;
+	page: number;
 }
 
 export interface IMantineInputProps<T> {
